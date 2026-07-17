@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('inventories', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('product_id')->unique()->constrained()->cascadeOnDelete();
+            $table->unsignedInteger('quantity')->default(0);    
+            $table->timestamp('last_stock_update')->nullable();    
             $table->timestamps();
         });
     }
