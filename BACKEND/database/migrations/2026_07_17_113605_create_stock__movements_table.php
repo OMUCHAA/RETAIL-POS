@@ -13,6 +13,16 @@ return new class extends Migration
     {
         Schema::create('stock__movements', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('product_id')->constrained()->restrictOnDelete();
+            $table->enum('movement_type', [
+                'purchase',
+                'sale',
+                'customer_return',
+                'supplier_return',
+                'adjustment',
+            ]);
+            $table->unsignedInteger('quantity')->default(0);
+            $table->text('remarks')->nullable();
             $table->timestamps();
         });
     }
