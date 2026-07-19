@@ -6,5 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Inventory extends Model
 {
-    //
+    protected $fillable = [
+        'product_id',
+        'quantity',
+        'last_stock_update'
+    ];
+
+    public function product() {
+        return $this->belongsTo(Product::class);
+    }
 }
