@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use phpDocumentor\Reflection\Types\Nullable;
 
 return new class extends Migration
 {
@@ -13,6 +14,22 @@ return new class extends Migration
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('customer_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('user_id')->constrained()->restrictOnDelete();
+            $table->date('sale_date');
+            $table->string('invoice_number')->unique();
+            $table->decimal('total_amount', 10, 2);
+            $table->enum('payment_method', [
+                'mpesa', 
+                'cash',
+                'card'
+            ])->default('cash');
+            $table->enum('payment_status', [
+                'paid',
+                'pending',
+                'partial'
+            ])->default('paid');
+            $table->text('remarks')->nullable();
             $table->timestamps();
         });
     }
