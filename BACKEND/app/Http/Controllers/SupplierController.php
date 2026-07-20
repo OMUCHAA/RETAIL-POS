@@ -14,21 +14,28 @@ class SupplierController extends Controller
     {
         //
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //
+        //validate
+        $validated = $request->validate([
+            'supplier_name' => 'string|required|max:255|unique:suppliers,supplier_name',
+            'company_name' => 'required|string|max:255|unique:suppliers,company_name',
+            'contact_phone' => 'string|required|max:20',
+            'contact_email' => 'email|nullable|max:255',
+            'address' => 'string|nullable|max:255',
+            'status' => 'boolean',
+            'remarks' => 'string|nullable'
+        ]);
+
+        $supplier = Supplier::create($validated);
+
+        return response()->json([
+            'message' => 'supplier crated successfully',
+            'supplier' => $supplier
+        ], 201);
     }
 
     /**
