@@ -31,7 +31,7 @@ class CategoryController extends Controller
 
         return response()->json([
             'message' => 'Category created successfully',
-            'data' => $category
+            'category' => $category
         ], 201);
     }
 
