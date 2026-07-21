@@ -14,7 +14,11 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        $categories = Category::all();
+
+        return response()->json([
+            'categories' => $categories 
+        ], 200);
     }
     /**
      * Store a newly created resource in storage.
@@ -29,7 +33,7 @@ class CategoryController extends Controller
 
         //Persist the databse. 
         $category = Category::create($validated);
-        
+
         //Returning a json response.
         return response()->json([
             'message' => 'Category created successfully',
@@ -42,7 +46,9 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        // 
+        return response()->json([
+            'category' => $category
+        ], 200); 
     }
 
     /**
