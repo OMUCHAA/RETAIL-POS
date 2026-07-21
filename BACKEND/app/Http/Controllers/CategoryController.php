@@ -52,19 +52,24 @@ class CategoryController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Category $category)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Category $category)
     {
-        //
+        //validate
+        $validated =$request->validate([
+            'name' => 'string|required|unique:categories,name,' . $category->id,
+            'description' => 'string|nullable'
+        ]);
+
+        //Update
+        $category->update($validated);
+
+        //Return a json response
+        return response()->json([
+            'category' => $category,
+            'message' => 'Category updated successfully'
+        ], 200);
     }
 
     /**
@@ -72,6 +77,9 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        $category->delete();
+        return response()->json([
+            'message' => 'Category deleted successfully'
+        ]);
     }
 }
