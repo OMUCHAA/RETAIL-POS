@@ -27,8 +27,10 @@ class CategoryController extends Controller
             'description' => 'nullable|string'
         ]);
 
+        //Persist the databse. 
         $category = Category::create($validated);
-
+        
+        //Returning a json response.
         return response()->json([
             'message' => 'Category created successfully',
             'category' => $category
@@ -40,7 +42,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        //
+        // 
     }
 
     /**
