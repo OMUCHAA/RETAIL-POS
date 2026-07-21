@@ -17,7 +17,7 @@ class CategoryController extends Controller
         $categories = Category::all();
 
         return response()->json([
-            'categories' => $categories 
+            'categories' => $categories
         ], 200);
     }
     /**
@@ -48,7 +48,7 @@ class CategoryController extends Controller
     {
         return response()->json([
             'category' => $category
-        ], 200); 
+        ], 200);
     }
 
     /**
@@ -57,7 +57,7 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         //validate
-        $validated =$request->validate([
+        $validated = $request->validate([
             'name' => 'string|required|unique:categories,name,' . $category->id,
             'description' => 'string|nullable'
         ]);
@@ -77,9 +77,15 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        $category->delete();
-        return response()->json([
-            'message' => 'Category deleted successfully'
-        ]);
+        try {
+            $category->delete();
+            return response()->json([
+                'message' => 'Category deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'This category cannot be deleted because it has one or more products.'
+            ]);
+        }
     }
 }
