@@ -47,7 +47,9 @@ class SupplierController extends Controller
      */
     public function show(Supplier $supplier)
     {
-        //
+        return response()->json([
+            'supplier' => $supplier
+        ], 200);
     }
 
     /**
