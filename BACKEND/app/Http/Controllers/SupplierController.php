@@ -12,7 +12,11 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        //
+        $suppliers = Supplier::latest()->paginate(10);
+
+        return response()->json([
+            'suppliers'=>$suppliers
+        ], 200);
     }
     /**
      * Store a newly created resource in storage.
