@@ -82,7 +82,7 @@ class SupplierController extends Controller
      */
     public function destroy(Supplier $supplier)
     {
-        
+        //error handling incase supplier has a purchse history it should not be deleted.
         try {
             $supplier->delete();
 
