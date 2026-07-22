@@ -15,7 +15,7 @@ class SupplierController extends Controller
         $suppliers = Supplier::latest()->paginate(10);
 
         return response()->json([
-            'suppliers'=>$suppliers
+            'suppliers' => $suppliers
         ], 200);
     }
     /**
@@ -51,21 +51,30 @@ class SupplierController extends Controller
             'supplier' => $supplier
         ], 200);
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Supplier $supplier)
-    {
-        //
-    }
-
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Supplier $supplier)
     {
-        //
+        //Validate data
+        $validated = $request->validate([
+            'supplier_name' => 'string|required|max:255|unique:suppliers,supplier_name,' . $supplier->id,
+            'company_name' => 'required|string|max:255|unique:suppliers,company_name,'. $supplier->id,
+            'contact_phone' => 'string|required|max:20',
+            'contact_email' => 'email|nullable|max:255',
+            'address' => 'string|nullable|max:255',
+            'status' => 'boolean',
+            'remarks' => 'string|nullable'
+        ]);
+
+        //Persit data to the databse
+        $supplier->update($validated);
+
+        //return a json data response
+        return response()->json([
+            'message' => 'Supplier updated successfully',
+            'supplier' => $supplier
+        ], 200);
     }
 
     /**
@@ -73,6 +82,17 @@ class SupplierController extends Controller
      */
     public function destroy(Supplier $supplier)
     {
-        //
+        
+        try {
+            $supplier->delete();
+
+            return response()->json([
+                'message'=> 'supplier deleted successfully'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message'=> 'Supplier cannot be deleted because it has purchase records'
+            ],409);
+        }
     }
 }
