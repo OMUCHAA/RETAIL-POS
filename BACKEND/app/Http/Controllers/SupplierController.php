@@ -47,6 +47,7 @@ class SupplierController extends Controller
      */
     public function show(Supplier $supplier)
     {
+        //Using a model binding method instesd of an id.
         return response()->json([
             'supplier' => $supplier
         ], 200);
