@@ -10,9 +10,14 @@ class SupplierController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $suppliers = Supplier::latest()->paginate(10);
+        $suppliers = Supplier::when($request->search, function($query) use ($request) {
+            $query->where('supplier_name', 'like', '%' . $request->search . '%')
+            ->orWhere('company_name', 'like', '%' . $request->search . '%')
+            ->orWhere('contact_phone', 'like', '%' . $request->search . '%')
+            ->orWhere('company_email', 'like', '%' . $request->search . '%');
+        })->latest()->paginate(10)->withQueryString();
 
         return response()->json([
             'suppliers' => $suppliers
