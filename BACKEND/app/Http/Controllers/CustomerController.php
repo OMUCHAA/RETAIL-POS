@@ -36,7 +36,25 @@ class CustomerController extends Controller
 	 */
 	public function store(Request $request)
 	{
-		//
+		//Validating data before storing
+		$validated = $request->validate([
+			'customer_name' => 'string|required|max:255',
+			'phone_number' => 'string|nullable|max:20|unique:customer,phone_number',
+			'email' => 'email|nullable|max:255',
+			'address' => 'nullable|string|max:255',
+		]);
+
+		//Persit to the DB
+		$customer = Customer::create([
+			...$validated,
+			'status'=> true,
+		]);
+
+		//Return the json response.
+		return response()->json([
+			'message' => 'Customer created successfully.',
+			'customer' => $customer
+		]);
 	}
 
 	/**
