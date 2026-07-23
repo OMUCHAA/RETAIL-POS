@@ -7,59 +7,59 @@ use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
+	/**
+	 * Display a listing of the resource.
+	 */
+	public function index(Request $request)
+	{
+		$customers = Customer::where('status', true)
+			->when($request->search, function ($query) use ($request) {
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+				$query->where(function ($query) use ($request) {
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+					$query->where('customer_name', 'like', '%' . $request->search . '%')
+						->orWhere('phone_number', 'like', '%' . $request->search . '%')
+						->orWhere('email', 'like', '%' . $request->search . '%');
+				});
+			})
+			->latest()
+			->paginate(10)
+			->withQueryString();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Customer $customer)
-    {
-        //
-    }
+		return response()->json([
+			'customers' => $customers,
+		], 200);
+	}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Customer $customer)
-    {
-        //
-    }
+	/**
+	 * Store a newly created resource in storage.
+	 */
+	public function store(Request $request)
+	{
+		//
+	}
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Customer $customer)
-    {
-        //
-    }
+	/**
+	 * Display the specified resource.
+	 */
+	public function show(Customer $customer)
+	{
+		//
+	}
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Customer $customer)
-    {
-        //
-    }
+	/**
+	 * Update the specified resource in storage.
+	 */
+	public function update(Request $request, Customer $customer)
+	{
+		//
+	}
+
+	/**
+	 * Remove the specified resource from storage.
+	 */
+	public function destroy(Customer $customer)
+	{
+		//
+	}
 }
