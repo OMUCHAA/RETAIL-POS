@@ -39,7 +39,7 @@ class CustomerController extends Controller
 		//Validating data before storing
 		$validated = $request->validate([
 			'customer_name' => 'string|required|max:255',
-			'phone_number' => 'string|nullable|max:20|unique:customer,phone_number',
+			'phone_number' => 'string|required|max:20|unique:customer,phone_number',
 			'email' => 'email|nullable|max:255',
 			'address' => 'nullable|string|max:255',
 		]);
