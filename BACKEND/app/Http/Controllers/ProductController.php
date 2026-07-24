@@ -10,9 +10,21 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $products = Product::with(['category', 'inventory'])
+        ->where('status', true)
+        ->when($request->search, function ($query) use ($request) {
+            $query->where(function ($query) use ($request) {
+                $query->where('barcode', 'like', '%' . $request->search . '%')
+                ->orWhere('name', 'like', '%' . $request->search . '%')
+                ->orWhere('SKU', 'like', '%' . $request->search . '%');
+            });
+        })->latest()->paginate(10)->withQueryString();
+
+        return response()->json([
+            'products0' => $products
+        ], 200);
     }
 
     /**

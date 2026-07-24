@@ -47,7 +47,7 @@ class CustomerController extends Controller
 		//Persit to the DB
 		$customer = Customer::create([
 			...$validated,
-			'status'=> true,
+			'status' => true,
 		]);
 
 		//Return the json response.
@@ -63,7 +63,7 @@ class CustomerController extends Controller
 	public function show(Customer $customer)
 	{
 		return response()->json([
-			'customer'=>$customer
+			'customer' => $customer
 		], 200);
 	}
 
@@ -76,9 +76,9 @@ class CustomerController extends Controller
 		$validated = $request->validate([
 			'customer_name' => 'string|required|max:255',
 			'phone_number' => 'string|required|max:20|unique:customer,phone_number,' . $customer->id,
-			'email'=> 'email|max:255|nullable',
-			'address'=>'nullable|max:255|string',
-			'status'=> 'required|boolean'
+			'email' => 'email|max:255|nullable',
+			'address' => 'nullable|max:255|string',
+			'status' => 'required|boolean'
 		]);
 
 		//Persist the DB
@@ -86,8 +86,8 @@ class CustomerController extends Controller
 
 		//return a json response
 		return response()->json([
-			'customer'=> $customer,
-			'message'=> 'customer updated successfuully.'
+			'customer' => $customer,
+			'message' => 'customer updated successfuully.'
 		], 200);
 	}
 
@@ -97,11 +97,11 @@ class CustomerController extends Controller
 	public function destroy(Customer $customer)
 	{
 		$customer->update([
-			'status'=> false
-		]);	
+			'status' => false
+		]);
 
 		return response()->json([
-			'message'=> 'Customer deactivated successfully.'
+			'message' => 'Customer deactivated successfully.'
 		], 200);
 	}
 }
