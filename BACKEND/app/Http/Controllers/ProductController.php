@@ -23,7 +23,7 @@ class ProductController extends Controller
         })->latest()->paginate(10)->withQueryString();
 
         return response()->json([
-            'products0' => $products
+            'products' => $products
         ], 200);
     }
 
