@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('purchase_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->restrictOnDelete();
             $table->unsignedInteger('quantity')->default(0);
-            $table->decimal('buying_price');
-            $table->decimal('subtotal');
+            $table->decimal('buying_price', 10, 2);
+            $table->decimal('subtotal', 10, 2);
             $table->timestamps();
         });
     }

@@ -10,9 +10,19 @@ class PurchaseController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $purchases = Purchase::with('supplier')
+        ->when($request->search, function ($query) use ($request)  {
+            $query->where('invoice_number', 'like', '%' . $request->search . '%')
+            ->orWhereHas('supplier', function($query) use ($request) {
+                $query->where('supplier_name', 'like', '%' . $request->search . '%');
+            });
+        })->latest()->paginate(10)->withQueryString();
+
+        return response()->json([
+            'purchases' => $purchases
+        ], 200);
     }
 
     /**

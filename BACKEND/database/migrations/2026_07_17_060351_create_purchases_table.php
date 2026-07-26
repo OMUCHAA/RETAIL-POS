@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('supplier_id')->constrained()->restrictOnDelete();
             $table->date('purchase_date');
             $table->string('invoice_number')->unique();
-            $table->decimal('total_amount', 10, 2);
+            $table->decimal('total_amount', 10, 2)->default(0);
             $table->enum('payment_status', [
                 'pending',
                 'partial',
