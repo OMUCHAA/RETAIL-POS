@@ -109,6 +109,13 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        //Deactivate the product
+        $product->update([
+            'status'=> false
+        ]);
+
+        return response()->json([
+            'message'=> 'Product deactivated successfully.'
+        ], 200);
     }
 }
