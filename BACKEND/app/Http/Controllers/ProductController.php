@@ -80,7 +80,28 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        //
+        //Validate
+        $validated = $request->validate([
+            'category_id'=> 'required|exists:categories,id',
+            'barcode'=> 'string|max:255|unique:products,barcode,' . $product->id,
+            'name'=> 'required|string|max:255',
+            'image'=> 'nullable|image|mimes:jpeg,jpg,png,webp',
+            'SKU'=> 'required|string|unique:products,SKU,' . $product->id,
+            'description'=> 'nullable|string',
+            'buying_price'=> 'required|numeric|min:0',
+            'selling_price'=> 'required|numeric|min:0',
+            'unit'=> 'required|string|max:100',
+            'minimum_stock'=> 'required|integer|min:0',
+            'status'=> 'required|boolean'
+        ]);
+
+        $product->update($validated);
+
+        return response()->json([
+            'message'=> 'Product updated successfully',
+            'product'=> $product
+        ], 200);
+
     }
 
     /**
