@@ -43,8 +43,8 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'buying_price' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
-            'unit' => 'required|min:100|string',
-            'minimum_stock' => 'required|interger|min:0'
+            'unit' => 'required|string|min:100',
+            'minimum_stock' => 'required|integer|min:0'
         ]);
 
         $product = DB::transaction(function () use ($validated) {
@@ -68,7 +68,11 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
+        $product->load(['category', 'inventory']);
+        //Using Model binding
+        return response()->json([
+            'product'=> $product
+        ], 200);
     }
 
     /**
