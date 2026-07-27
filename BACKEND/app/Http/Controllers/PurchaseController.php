@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Purchase;
+use App\Models\Inventory;
 use App\Models\Purchase_Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +48,7 @@ class PurchaseController extends Controller
         ]);
 
         $purchase = DB::transaction(function() use ($validated) {
-            
+            //Getting all the validated purchase records.
             $purchase = Purchase::create([
                 'supplier_id'=> $validated['supplier_id'],
                 'purchase_date'=> $validated['purchase_date'],
@@ -57,18 +58,24 @@ class PurchaseController extends Controller
                 'total_amount'=> 0
             ]);
 
+            //Going through all the items and calculating and adding all the subtotal.          
             $totalAmount = 0;
             foreach($validated['items'] as $item) {
                 $subtotal = $item['quantity'] * $item['buying_price'];
                 Purchase_Item::create([
                     'purchase_id'=> $purchase->id,
                     'product_id'=> $item['product_id'],
-                    'quantity'=> $item['qunatity'],
+                    'quantity'=> $item['quantity'],
                     'buying_price'=> $item['buying_price'],
                     'subtotal'=> $subtotal
                 ]);
 
                 $totalAmount += $subtotal;
+
+                //Update the Inventory
+                $inventory = Inventory::where('product_id', $item['product_id'])->first();
+                $inventory->quantity += $item['quantity'];
+                $inventory->save();
             }
         });
     }
