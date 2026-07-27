@@ -87,13 +87,13 @@ class PurchaseController extends Controller
       //Update the Purchase total amount.
         $purchase->total_amount = $totalAmount;
         $purchase->save();
-        
+
       return $purchase;
     });
 
     return response()->json([
       'message'=> 'Purchase recorded successfully',
-      'purchase'=> $purchase->load('supplier', 'items.product')
+      'purchase'=> $purchase->load('supplier', 'purchaseItems.product')
     ],201);
   }
 
@@ -102,7 +102,12 @@ class PurchaseController extends Controller
    */
   public function show(Purchase $purchase)
   {
-    //
+    //Load the purchase with everything related to it.
+    $purchase->load('supplier', 'purchaseItems.product');
+
+    response()->json([
+      'purchase'=> $purchase
+    ], 200);
   }
 
   /**
