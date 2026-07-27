@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Purchase;
+use App\Models\Purchase_Item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PurchaseController extends Controller
 {
@@ -26,33 +28,55 @@ class PurchaseController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //
+        //Validation
+        $validated =$request->validate([
+            'supplier_id'=> 'required|exists:suppliers,id',
+            'purchase_date'=> 'required|date',
+            'invoice_number'=> 'required|string|max:255|unique:purchases,invoice_number',
+            'payment_status'=> 'required|in:pending,partial,paid',
+            'remaks'=> 'nullable|string',
+            //items data
+            'items'=> 'required|array|min:1',
+            'items.*.product_id'=> 'required|exists:products,id',
+            'items.*.quantity'=> 'required|integer|min:1',
+            'items.*.buying_price'=> 'required|integer|min:0'
+        ]);
+
+        $purchase = DB::transaction(function() use ($validated) {
+            
+            $purchase = Purchase::create([
+                'supplier_id'=> $validated['supplier_id'],
+                'purchase_date'=> $validated['purchase_date'],
+                'invoice_number'=> $validated['invoice_number'],
+                'payment_status'=> $validated['payment_status'],
+                'remarks'=> $validated['remarks'] ?? null,
+                'total_amount'=> 0
+            ]);
+
+            $totalAmount = 0;
+            foreach($validated['items'] as $item) {
+                $subtotal = $item['quantity'] * $item['buying_price'];
+                Purchase_Item::create([
+                    'purchase_id'=> $purchase->id,
+                    'product_id'=> $item['product_id'],
+                    'quantity'=> $item['qunatity'],
+                    'buying_price'=> $item['buying_price'],
+                    'subtotal'=> $subtotal
+                ]);
+
+                $totalAmount += $subtotal;
+            }
+        });
     }
 
     /**
      * Display the specified resource.
      */
     public function show(Purchase $purchase)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Purchase $purchase)
     {
         //
     }
