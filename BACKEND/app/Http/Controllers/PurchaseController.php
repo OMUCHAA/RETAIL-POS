@@ -206,6 +206,25 @@ class PurchaseController extends Controller
    */
   public function destroy(Purchase $purchase)
   {
-    //
+    //Use Transaction
+    DB::transaction(function () use ($purchase) {
+      // Load purchase items
+      $purchase->load('purchaseItems');
+
+      // Reverse inventory
+      foreach ($purchase->purchaseItems as $purchaseItem) {
+        $inventory = Inventory::where('product_id', $purchaseItem->product_id)->first();
+
+        $inventory->quantity -= $purchaseItem->quantity;
+        $inventory->last_stock_update = now();
+        $inventory->save();
+      }
+
+      //Delete purchase items
+      $purchase->purchaseItems()->delete();
+
+      //Delete purchase
+      $purchase->delete();
+    });
   }
 }
