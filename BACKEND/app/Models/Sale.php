@@ -20,4 +20,8 @@ class Sale extends Model
     public function salesItems() {
         return $this->hasMany(Sale_Item::class);
     }
+
+    public function customer() {
+        return $this->belongsTo(Customer::class);
+    }
 }
