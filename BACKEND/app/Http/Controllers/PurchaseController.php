@@ -135,7 +135,7 @@ class PurchaseController extends Controller
       // Load old purchase items.
       $purchase->load('purchaseItems');
 
-      //Reverse inventory
+      //Reverse old inventory
       foreach ($purchase->purchaseItems as $purchaseItem) {
         $inventory = Inventory::where(
           'product_id',
@@ -219,7 +219,6 @@ class PurchaseController extends Controller
         $inventory->last_stock_update = now();
         $inventory->save();
       }
-
       //Delete purchase items
       $purchase->purchaseItems()->delete();
 
