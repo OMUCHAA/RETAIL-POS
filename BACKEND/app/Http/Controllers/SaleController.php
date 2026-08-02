@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Inventory;
 use App\Models\Sale;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SaleController extends Controller
 {
@@ -35,33 +37,59 @@ class SaleController extends Controller
   }
 
   /**
-   * Show the form for creating a new resource.
-   */
-  public function create()
-  {
-    //
-  }
-
-  /**
    * Store a newly created resource in storage.
    */
   public function store(Request $request)
   {
-    //
+    $validated = $request->validate([
+      'customer_id' => 'required|exists:customers,id',
+      'user_id' => 'required|exists:users,id',
+      'sale_date' => 'required|date',
+      'invoice_number' => 'required|string|max:255|unique:sales,invoice_number',
+      'payment_method' => 'required|in:cash,mpesa,card',
+      'payment_status' => 'required|in:paid,pending,partial',
+      'remarks' => 'nullable',
+
+      'saleItems' => 'required|array|min:1',
+      'saleItems.*.product_id' => 'required|exists:products,id',
+      'saleItems.*.quantity' => 'required|integer|min:1',
+    ]);
+
+    foreach ($validated['saleItems'] as $saleItem) {
+      $inventory = Inventory::with('product')->where('product_id', $saleItem->product_id)->first();
+
+      if ($inventory->quantity < $saleItem['quantity']) {
+        return response()->json([
+          'message' => 'Insufficient stock for ' . $inventory->product->name,
+        ], 422);
+      }
+    }
+
+    $sale = DB::transaction(function() use ($validated) {
+      $sale = Sale::create([
+        'customer_id'=> $validated['customer_id'],
+        'user_id'=> $validated['user_id'],
+        'sale_date'=> $validated['sale_date'],
+        'invoice_number'=> $validated['invoice_number'],
+        'payment_method'=> $validated['payment_method'],
+        'payment_status'=> $validated['payment_status'],
+        'remarks'=> $validated['remarks'],
+        'total_amount'=> 0
+      ]);
+      $totalAmount = 0;
+
+      foreach($validated['saleItems'] as $saleItem) {
+          $inventory = Inventory::with('product')->where('product_id', $saleItem['product_id'])->first();
+
+          $subtotal = $saleItem['quantity'] * $inventory->product->selling_price;
+      }
+    });
   }
 
   /**
    * Display the specified resource.
    */
   public function show(Sale $sale)
-  {
-    //
-  }
-
-  /**
-   * Show the form for editing the specified resource.
-   */
-  public function edit(Sale $sale)
   {
     //
   }
