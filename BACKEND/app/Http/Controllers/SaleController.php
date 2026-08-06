@@ -42,6 +42,7 @@ class SaleController extends Controller
    */
   public function store(Request $request)
   {
+    //Validation
     $validated = $request->validate([
       'customer_id' => 'required|exists:customers,id',
       'user_id' => 'required|exists:users,id',
@@ -50,7 +51,7 @@ class SaleController extends Controller
       'payment_method' => 'required|in:cash,mpesa,card',
       'payment_status' => 'required|in:paid,pending,partial',
       'remarks' => 'nullable',
-
+      //items data
       'saleItems' => 'required|array|min:1',
       'saleItems.*.product_id' => 'required|exists:products,id',
       'saleItems.*.quantity' => 'required|integer|min:1',
@@ -67,6 +68,7 @@ class SaleController extends Controller
     }
 
     $sale = DB::transaction(function () use ($validated) {
+      //getting all validated sales records.
       $sale = Sale::create([
         'customer_id' => $validated['customer_id'],
         'user_id' => $validated['user_id'],
@@ -77,6 +79,8 @@ class SaleController extends Controller
         'remarks' => $validated['remarks'],
         'total_amount' => 0
       ]);
+
+      //Going through all items and calculating and adding all the subtotals.
       $totalAmount = 0;
 
       foreach ($validated['saleItems'] as $saleItem) {
@@ -94,6 +98,7 @@ class SaleController extends Controller
 
         $totalAmount += $subtotal;
 
+        //Updating the inventory.
         $inventory->quantity -= $saleItem['quantity'];
         $inventory->last_stock_update = now();
         $inventory->save();
@@ -106,7 +111,7 @@ class SaleController extends Controller
     });
 
     return response()->json([
-      'sale' => $sale->load('cuatomer', 'saleItems.product'),
+      'sale' => $sale->load('customer', 'saleItems.product'),
       'message' => 'Sale created successfully'
     ], 201);
   }
@@ -116,7 +121,11 @@ class SaleController extends Controller
    */
   public function show(Sale $sale)
   {
-    //
+    $sale->load('customer', 'saleItems.product');
+
+    return response()->json([
+      'sale'=> $sale
+    ], 200);
   }
 
   /**
