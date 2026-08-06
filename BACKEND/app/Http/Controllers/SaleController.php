@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Inventory;
 use App\Models\Sale;
+use App\Models\Sale_Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -65,25 +66,49 @@ class SaleController extends Controller
       }
     }
 
-    $sale = DB::transaction(function() use ($validated) {
+    $sale = DB::transaction(function () use ($validated) {
       $sale = Sale::create([
-        'customer_id'=> $validated['customer_id'],
-        'user_id'=> $validated['user_id'],
-        'sale_date'=> $validated['sale_date'],
-        'invoice_number'=> $validated['invoice_number'],
-        'payment_method'=> $validated['payment_method'],
-        'payment_status'=> $validated['payment_status'],
-        'remarks'=> $validated['remarks'],
-        'total_amount'=> 0
+        'customer_id' => $validated['customer_id'],
+        'user_id' => $validated['user_id'],
+        'sale_date' => $validated['sale_date'],
+        'invoice_number' => $validated['invoice_number'],
+        'payment_method' => $validated['payment_method'],
+        'payment_status' => $validated['payment_status'],
+        'remarks' => $validated['remarks'],
+        'total_amount' => 0
       ]);
       $totalAmount = 0;
 
-      foreach($validated['saleItems'] as $saleItem) {
-          $inventory = Inventory::with('product')->where('product_id', $saleItem['product_id'])->first();
+      foreach ($validated['saleItems'] as $saleItem) {
+        $inventory = Inventory::with('product')->where('product_id', $saleItem['product_id'])->first();
 
-          $subtotal = $saleItem['quantity'] * $inventory->product->selling_price;
+        $subtotal = $saleItem['quantity'] * $inventory->product->selling_price;
+
+        Sale_Item::create([
+          'sale_id' => $sale->id,
+          'product_id' => $saleItem['product_id'],
+          'quantity' => $saleItem['quantity'],
+          'selling_price' => $inventory->product->selling_price,
+          'subtotal' => $subtotal,
+        ]);
+
+        $totalAmount += $subtotal;
+
+        $inventory->quantity -= $saleItem['quantity'];
+        $inventory->last_stock_update = now();
+        $inventory->save();
       }
+
+      $sale->total_amount = $totalAmount;
+      $sale->save();
+
+      return $sale;
     });
+
+    return response()->json([
+      'sale' => $sale->load('cuatomer', 'saleItems.product'),
+      'message' => 'Sale created successfully'
+    ], 201);
   }
 
   /**
