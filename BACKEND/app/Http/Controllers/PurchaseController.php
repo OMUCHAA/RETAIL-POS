@@ -129,7 +129,7 @@ class PurchaseController extends Controller
       'purchaseItems.*.quantity' => 'required|integer|min:1',
       'purchaseItems.*.buying_price' => 'required|numeric|min:0',
     ]);
-
+ 
     //Transaction method
     $purchase = DB::transaction(function () use ($validated, $purchase) {
       // Load old purchase items.

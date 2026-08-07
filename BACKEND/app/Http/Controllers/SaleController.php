@@ -6,6 +6,7 @@ use App\Models\Inventory;
 use App\Models\Sale;
 use App\Models\Sale_Item;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 
 class SaleController extends Controller
@@ -133,7 +134,18 @@ class SaleController extends Controller
    */
   public function update(Request $request, Sale $sale)
   {
-    //
+    $validated = $request->validate([
+      'customer_id'=> 'required|exists:customers,id',
+      'user_id'=> 'required|exists:users,id',
+      'sale_date'=> 'required|date',
+      'invoice_number'=> ['required', 'string', Rule::unique('sales')->ignore($sale->id)],
+      'payment_status'=> 'required|in:pending,partial,paid',
+      'payment_method'=> 'required|in:cash,mpesa,card',
+
+      'saleItems'=> 'required|array|min:1',
+      'saleItems.*.product_id'=> 'required|exists:products,id',
+      'saleItems.*.quantity'=> 'required|integer|min:1'
+    ]);
   }
 
   /**
