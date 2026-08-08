@@ -8,6 +8,7 @@ use App\Models\Sale_Item;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class SaleController extends Controller
 {
@@ -169,9 +170,9 @@ class SaleController extends Controller
         $inventory = Inventory::with('product')->where('product_id', $saleItem['product_id'])->first();
 
         if ($inventory->quantity < $saleItem['quantity']) {
-          return response()->json([
-            'message' => 'Insufficient stock for ' . $inventory->product->name
-          ], 422);
+          throw ValidationException::withMessages([
+            'items' => 'Insufficient stock for ' . $inventory->product->name
+          ]);
         }
       }
 
