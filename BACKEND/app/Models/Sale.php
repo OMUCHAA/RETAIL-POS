@@ -17,7 +17,7 @@ class Sale extends Model
         'remarks'
     ];
 
-    public function salesItems() {
+    public function saleItems() {
         return $this->hasMany(Sale_Item::class);
     }
 

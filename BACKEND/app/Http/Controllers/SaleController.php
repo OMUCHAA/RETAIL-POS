@@ -230,6 +230,27 @@ class SaleController extends Controller
    */
   public function destroy(Sale $sale)
   {
-    //
+    DB::transaction(function () use ($sale) {
+      //load sale items
+      $sale->load('saleItems');
+
+      //Restore Inventory
+      foreach ($sale->saleItems as $saleItem) {
+        $inventory = Inventory::with('product')->where(
+          'product_id',
+          $saleItem->product_id
+        )->first();
+
+        $inventory->quantity += $saleItem->quantity;
+        $inventory->last_stock_update = now();
+        $inventory->save();
+      }
+
+      //Delete sale items 
+      $sale->saleItems()->delete();
+
+      //Delete sale
+      $sale->delete();
+    });
   }
 }
