@@ -51,7 +51,7 @@ class SaleController extends Controller
       'invoice_number' => 'required|string|max:255|unique:sales,invoice_number',
       'payment_method' => 'required|in:cash,mpesa,card',
       'payment_status' => 'required|in:paid,pending,partial',
-      'remarks' => 'nullable',
+      'remarks' => 'nullable|string',
       //items data
       'saleItems' => 'required|array|min:1',
       'saleItems.*.product_id' => 'required|exists:products,id',
@@ -125,7 +125,7 @@ class SaleController extends Controller
     $sale->load('customer', 'saleItems.product');
 
     return response()->json([
-      'sale'=> $sale
+      'sale' => $sale
     ], 200);
   }
 
@@ -135,17 +135,93 @@ class SaleController extends Controller
   public function update(Request $request, Sale $sale)
   {
     $validated = $request->validate([
-      'customer_id'=> 'required|exists:customers,id',
-      'user_id'=> 'required|exists:users,id',
-      'sale_date'=> 'required|date',
-      'invoice_number'=> ['required', 'string', Rule::unique('sales')->ignore($sale->id)],
-      'payment_status'=> 'required|in:pending,partial,paid',
-      'payment_method'=> 'required|in:cash,mpesa,card',
+      'customer_id' => 'required|exists:customers,id',
+      'user_id' => 'required|exists:users,id',
+      'sale_date' => 'required|date',
+      'invoice_number' => ['required', 'string', Rule::unique('sales')->ignore($sale->id)],
+      'payment_status' => 'required|in:pending,partial,paid',
+      'payment_method' => 'required|in:cash,mpesa,card',
+      'remarks' => 'nullable|string',
 
-      'saleItems'=> 'required|array|min:1',
-      'saleItems.*.product_id'=> 'required|exists:products,id',
-      'saleItems.*.quantity'=> 'required|integer|min:1'
+      'saleItems' => 'required|array|min:1',
+      'saleItems.*.product_id' => 'required|exists:products,id',
+      'saleItems.*.quantity' => 'required|integer|min:1'
     ]);
+
+    $sale = DB::transaction(function () use ($validated, $sale) {
+      $sale->load('saleItems');
+
+      foreach ($sale->saleItems as $saleItem) {
+        $inventory = Inventory::where(
+          'product_id',
+          $saleItem->product_id
+        )->first();
+
+        $inventory->quantity += $saleItem->quantity;
+        $inventory->last_stock_update = now();
+        $inventory->save();
+
+        $sale->salesItems()->delete();
+      }
+
+      //Now inspecting the new items that comes from the frontend and checkng the stock availability from the backend.
+      foreach ($validated['saleItems'] as $saleItem) {
+        $inventory = Inventory::with('product')->where('product_id', $saleItem['product_id'])->first();
+
+        if ($inventory->quantity < $saleItem['quantity']) {
+          return response()->json([
+            'message' => 'Insufficient stock for ' . $inventory->product->name
+          ], 422);
+        }
+      }
+
+      //update the sale header.
+      $sale->update([
+        'customer_id' => $validated['customer_id'],
+        'sale_date' => $validated['sale_date'],
+        'user_id' => $validated['user_id'],
+        'invoice_number' => $validated['invoice_number'],
+        'payment_method' => $validated['payment_method'],
+        'payment_status' => $validated['payment_status'],
+        'remarks' => $validated['remarks']
+      ]);
+
+      //Start calculating the new total.
+      $totalAmount = 0;
+      foreach ($validated['saleItems'] as $saleItem) {
+        $inventory = Inventory::with('product')->where(
+          'product_id',
+          $validated['product_id']
+        )->first();
+
+        $subtotal = $validated['quantity'] * $inventory->product->selling_price;
+
+        Sale_Item::create([
+          'sale_id' => $sale->id,
+          'product_id' => $validated['product_id'],
+          'quantity' => $validated['quantity'],
+          'selling_price' => $inventory->product->selling_price,
+          'subtotal' => $subtotal,
+        ]);
+
+        $totalAmount += $subtotal;
+
+        $inventory->quantity -= $saleItem['quantity'];
+        $inventory->last_stock_update = now();
+        $inventory->save();
+      }
+
+      //Save new total. 
+      $sale->total_amount = $totalAmount;
+      $sale->save();
+
+      return $sale;
+    });
+
+    return response()->json([
+      'message' => 'Sale updated successfully.',
+      'sale' => $sale->load('customer', 'salteItems.product')
+    ], 200);
   }
 
   /**
