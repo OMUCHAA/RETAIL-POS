@@ -221,7 +221,7 @@ class SaleController extends Controller
 
     return response()->json([
       'message' => 'Sale updated successfully.',
-      'sale' => $sale->load('customer', 'salteItems.product')
+      'sale' => $sale->load('customer', 'user', 'salteItems.product')
     ], 200);
   }
 
