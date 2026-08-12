@@ -47,7 +47,6 @@ class SaleController extends Controller
     //Validation
     $validated = $request->validate([
       'customer_id' => 'required|exists:customers,id',
-      'user_id' => 'required|exists:users,id',
       'sale_date' => 'required|date',
       'invoice_number' => 'required|string|max:255|unique:sales,invoice_number',
       'payment_method' => 'required|in:cash,mpesa,card',
@@ -69,11 +68,11 @@ class SaleController extends Controller
       }
     }
 
-    $sale = DB::transaction(function () use ($validated) {
+    $sale = DB::transaction(function () use ($validated, $request) {
       //getting all validated sales records.
       $sale = Sale::create([
         'customer_id' => $validated['customer_id'],
-        'user_id' => $validated['user_id'],
+        'user_id' => $request->user()->id,
         'sale_date' => $validated['sale_date'],
         'invoice_number' => $validated['invoice_number'],
         'payment_method' => $validated['payment_method'],
@@ -113,7 +112,7 @@ class SaleController extends Controller
     });
 
     return response()->json([
-      'sale' => $sale->load('customer', 'saleItems.product'),
+      'sale' => $sale->load('customer', 'user', 'saleItems.product'),
       'message' => 'Sale created successfully'
     ], 201);
   }
@@ -123,7 +122,7 @@ class SaleController extends Controller
    */
   public function show(Sale $sale)
   {
-    $sale->load('customer', 'saleItems.product');
+    $sale->load('customer', 'user', 'saleItems.product');
 
     return response()->json([
       'sale' => $sale
@@ -137,7 +136,6 @@ class SaleController extends Controller
   {
     $validated = $request->validate([
       'customer_id' => 'required|exists:customers,id',
-      'user_id' => 'required|exists:users,id',
       'sale_date' => 'required|date',
       'invoice_number' => ['required', 'string', Rule::unique('sales')->ignore($sale->id)],
       'payment_status' => 'required|in:pending,partial,paid',
@@ -149,7 +147,7 @@ class SaleController extends Controller
       'saleItems.*.quantity' => 'required|integer|min:1'
     ]);
 
-    $sale = DB::transaction(function () use ($validated, $sale) {
+    $sale = DB::transaction(function () use ($request, $validated, $sale) {
       $sale->load('saleItems');
 
       foreach ($sale->saleItems as $saleItem) {
@@ -180,7 +178,7 @@ class SaleController extends Controller
       $sale->update([
         'customer_id' => $validated['customer_id'],
         'sale_date' => $validated['sale_date'],
-        'user_id' => $validated['user_id'],
+        'user_id' => $request->user()->id,
         'invoice_number' => $validated['invoice_number'],
         'payment_method' => $validated['payment_method'],
         'payment_status' => $validated['payment_status'],
