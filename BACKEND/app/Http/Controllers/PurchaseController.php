@@ -38,6 +38,7 @@ class PurchaseController extends Controller
     //Validation
     $validated = $request->validate([
       'supplier_id' => 'required|exists:suppliers,id',
+      'user_id'=> 'required|exists:users,id',
       'purchase_date' => 'required|date',
       'invoice_number' => 'required|string|max:255|unique:purchases,invoice_number',
       'payment_status' => 'required|in:pending,partial,paid',
@@ -53,6 +54,7 @@ class PurchaseController extends Controller
       //Getting all the validated purchase records.
       $purchase = Purchase::create([
         'supplier_id' => $validated['supplier_id'],
+        'user_id'=> $validated['user_id'],
         'purchase_date' => $validated['purchase_date'],
         'invoice_number' => $validated['invoice_number'],
         'payment_status' => $validated['payment_status'],
@@ -94,7 +96,7 @@ class PurchaseController extends Controller
 
     return response()->json([
       'message' => 'Purchase recorded successfully',
-      'purchase' => $purchase->load('supplier', 'purchaseItems.product')
+      'purchase' => $purchase->load('supplier', 'user', 'purchaseItems.product')
     ], 201);
   }
 
@@ -119,6 +121,7 @@ class PurchaseController extends Controller
     //Validation
     $validated = $request->validate([
       'supplier_id' => 'required|exists:suppliers,id',
+      'user_id' => 'required|exists:users,id',
       'purchase_date' => 'required|date',
       'invoice_number' => ['required', 'string', 'max:255', Rule::unique('purchases')->ignore($purchase->id)],
       'payment_status' => 'required|in:pending,partial,paid',
@@ -153,6 +156,7 @@ class PurchaseController extends Controller
       // Update purchase header
       $purchase->update([
         'supplier_id' => $validated['supplier_id'],
+        'user_id' => $validated['supplier_id'],
         'purchase_date' => $validated['purchase_date'],
         'invoice_number' => $validated['invoice_number'],
         'payment_status' => $validated['payment_status'],
@@ -199,6 +203,11 @@ class PurchaseController extends Controller
 
       return $purchase;
     });
+
+    return response()->json([
+      'purchase' => $purchase->load('supplier', 'user', 'product.name'),
+      'message'=> 'Purchase upadted successfully.'
+    ]);
   }
 
   /**
