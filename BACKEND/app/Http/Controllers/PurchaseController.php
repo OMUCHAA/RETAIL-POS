@@ -38,7 +38,6 @@ class PurchaseController extends Controller
     //Validation
     $validated = $request->validate([
       'supplier_id' => 'required|exists:suppliers,id',
-      'user_id'=> 'required|exists:users,id',
       'purchase_date' => 'required|date',
       'invoice_number' => 'required|string|max:255|unique:purchases,invoice_number',
       'payment_status' => 'required|in:pending,partial,paid',
@@ -50,11 +49,11 @@ class PurchaseController extends Controller
       'purchaseItems.*.buying_price' => 'required|integer|min:0'
     ]);
 
-    $purchase = DB::transaction(function () use ($validated) {
+    $purchase = DB::transaction(function () use ($request, $validated) {
       //Getting all the validated purchase records.
       $purchase = Purchase::create([
         'supplier_id' => $validated['supplier_id'],
-        'user_id'=> $validated['user_id'],
+        'user_id'=> $request->user()->id,
         'purchase_date' => $validated['purchase_date'],
         'invoice_number' => $validated['invoice_number'],
         'payment_status' => $validated['payment_status'],
@@ -106,7 +105,7 @@ class PurchaseController extends Controller
   public function show(Purchase $purchase)
   {
     //Load the purchase with everything related to it.
-    $purchase->load('supplier', 'purchaseItems.product');
+    $purchase->load(['supplier', 'user', 'purchaseItems.product']);
 
     response()->json([
       'purchase' => $purchase
@@ -121,7 +120,6 @@ class PurchaseController extends Controller
     //Validation
     $validated = $request->validate([
       'supplier_id' => 'required|exists:suppliers,id',
-      'user_id' => 'required|exists:users,id',
       'purchase_date' => 'required|date',
       'invoice_number' => ['required', 'string', 'max:255', Rule::unique('purchases')->ignore($purchase->id)],
       'payment_status' => 'required|in:pending,partial,paid',
@@ -134,7 +132,7 @@ class PurchaseController extends Controller
     ]);
  
     //Transaction method
-    $purchase = DB::transaction(function () use ($validated, $purchase) {
+    $purchase = DB::transaction(function () use ($request, $validated, $purchase) {
       // Load old purchase items.
       $purchase->load('purchaseItems');
 
@@ -156,7 +154,7 @@ class PurchaseController extends Controller
       // Update purchase header
       $purchase->update([
         'supplier_id' => $validated['supplier_id'],
-        'user_id' => $validated['supplier_id'],
+        'user_id' => $request->user()->id,
         'purchase_date' => $validated['purchase_date'],
         'invoice_number' => $validated['invoice_number'],
         'payment_status' => $validated['payment_status'],
