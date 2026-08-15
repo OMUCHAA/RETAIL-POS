@@ -22,6 +22,7 @@ return new class extends Migration
                 'admin',
                 'manager'
             ])->default('cashier');
+            $table->boolean('is_active')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });
