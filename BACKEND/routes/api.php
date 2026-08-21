@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -13,4 +13,11 @@ Route::middleware('auth:sanctum')->group(function () {
     //Authentication
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    //User management
+    Route::apiResource('/users', UserController::class)->except(['destroy']);
+
+    Route::patch('/users/{user}/deactivate', [UserController::class, 'deactivate']);
+
+    Route::patch('/user/{user}/reactivate', [UserController::class, 'reactivate']);
 });
