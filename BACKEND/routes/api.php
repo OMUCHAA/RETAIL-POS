@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PurchaseItemController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,4 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::patch('/users/{user}/reactivate', [UserController::class, 'reactivate']);
     });
+
+    //Admin and manager
+    Route::apiResource('purchases', PurchaseItemController::class)->middleware('role:admin,manager');
 });
