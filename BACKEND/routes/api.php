@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseItemController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -25,5 +27,12 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     //Admin and manager
-    Route::apiResource('purchases', PurchaseItemController::class)->middleware('role:admin,manager');
+    Route::apiResource('purchases', PurchaseController::class)->middleware('role:admin,manager');
+
+    //Products viewing
+    Route::apiResource('products', ProductController::class)->only(['index', 'show'])->middleware('role:admin,cashier,manager');
+
+    //Products management
+    Route::apiResource('products', ProductController::class)->only(['update', 'store', 'destroy'])->middleware('role:admin,manager');
+    
 });
