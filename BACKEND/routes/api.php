@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseItemController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,5 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Products management
     Route::apiResource('products', ProductController::class)->only(['update', 'store', 'destroy'])->middleware('role:admin,manager');
-    
+
+    //Supplier management
+    Route::apiResource('suppliers', SupplierController::class)->middleware('role:admin,manager');
 });
