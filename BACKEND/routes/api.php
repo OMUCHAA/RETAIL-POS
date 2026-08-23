@@ -15,9 +15,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     //User management
-    Route::apiResource('/users', UserController::class)->except(['destroy']);
+    Route::middleware('role:admin')->group(function () {
+        Route::apiResource('/users', UserController::class)->except(['destroy']);
 
-    Route::patch('/users/{user}/deactivate', [UserController::class, 'deactivate']);
+        Route::patch('/users/{user}/deactivate', [UserController::class, 'deactivate']);
 
-    Route::patch('/user/{user}/reactivate', [UserController::class, 'reactivate']);
+        Route::patch('/users/{user}/reactivate', [UserController::class, 'reactivate']);
+    });
 });
