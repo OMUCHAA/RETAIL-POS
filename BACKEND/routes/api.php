@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseItemController;
@@ -38,4 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Supplier management
     Route::apiResource('suppliers', SupplierController::class)->middleware('role:admin,manager');
+
+    //Customer viewing
+    Route::apiResource('customers', CustomerController::class)->only(['index', 'show'])->middleware('role:manager,cashier,admin');
+
+    //Customer management
+    Route::apiResource('customers', CustomerController::class)->only(['update', 'store', 'destroy'])->middleware('role:admin,manager');
 });
