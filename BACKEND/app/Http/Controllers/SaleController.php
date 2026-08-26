@@ -18,6 +18,9 @@ class SaleController extends Controller
   public function index(Request $request)
   {
     $sales = Sale::with('customer')
+      ->when($request->user()->role === 'cashier', function ($query) use ($request) {
+        $query->where('user_id', $request->user()->id);
+      })
       ->when($request->search, function ($query) use ($request) {
 
         $query->where('invoice_number', 'like', '%' . $request->search . '%')
