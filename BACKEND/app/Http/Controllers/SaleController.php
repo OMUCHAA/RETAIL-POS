@@ -123,8 +123,17 @@ class SaleController extends Controller
   /**
    * Display the specified resource.
    */
-  public function show(Sale $sale)
+  public function show(Sale $sale, Request $request)
   {
+    if (
+      $request->user()->role === 'cashier' &&
+      $sale->user_id !== $request->user()->id
+    ) {
+      return response()->json([
+        'message' => 'You are not authorized to view this sale.'
+      ], 403);
+    }
+
     $sale->load('customer', 'user', 'saleItems.product');
 
     return response()->json([
