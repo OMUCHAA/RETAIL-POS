@@ -29,7 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/users/{user}/reactivate', [UserController::class, 'reactivate']);
     });
 
-    //Admin and manager
+    //Admin and manager full purchase access
     Route::apiResource('purchases', PurchaseController::class)->middleware('role:admin,manager');
 
     //Products viewing
