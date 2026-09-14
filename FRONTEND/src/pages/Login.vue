@@ -136,7 +136,7 @@ const handleLogin = async () => {
       email: email.value,
       password: password.value,
     });
-    router.push("/dashboard");
+    router.push("/");
   } catch (err) {
     if (err.response?.status === 422) {
       error.value =
