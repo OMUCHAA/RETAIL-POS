@@ -5,8 +5,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 const router = createRouter({
     history: createWebHistory(),
     routes: [
-        {path: '/', name: 'home', component: Home},
-        {path: '/login', name: 'login', component: Login}
+        {path: '/home', name: 'home', component: Home},
+        {path: '/', name: 'login', component: Login}
     ]
 });
 

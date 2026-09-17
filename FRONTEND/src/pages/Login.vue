@@ -125,7 +125,7 @@ const password = ref("");
 const loading = ref(false);
 const error = ref("");
 
-const handleLogin = async () => {
+async function handleLogin() {
   error.value = "";
   loading.value = true;
 
@@ -136,7 +136,7 @@ const handleLogin = async () => {
       email: email.value,
       password: password.value,
     });
-    router.push("/");
+    router.push("/home");
   } catch (err) {
     if (err.response?.status === 422) {
       error.value =
@@ -156,5 +156,5 @@ const handleLogin = async () => {
   } finally {
     loading.value = false;
   }
-};
+}
 </script>
