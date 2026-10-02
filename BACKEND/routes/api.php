@@ -41,11 +41,20 @@ Route::middleware('auth:sanctum')->group(function () {
     //Supplier management
     Route::apiResource('suppliers', SupplierController::class)->middleware('role:admin,manager');
 
-    //Customer viewing
-    Route::apiResource('customers', CustomerController::class)->only(['index', 'show'])->middleware('role:manager,cashier,admin');
+    // Customer viewing
+    Route::apiResource('customers', CustomerController::class)
+        ->only(['index', 'show'])
+        ->middleware('role:admin,manager,cashier');
 
-    //Customer management
-    Route::apiResource('customers', CustomerController::class)->only(['update', 'store', 'destroy'])->middleware('role:admin,manager');
+    // Customer creation
+    Route::apiResource('customers', CustomerController::class)
+        ->only(['store'])
+        ->middleware('role:admin,manager,cashier');
+
+    // Customer management
+    Route::apiResource('customers', CustomerController::class)
+        ->only(['update', 'destroy'])
+        ->middleware('role:admin,manager');
 
     //Sale(s) viewing and creating
     Route::apiResource('sales', SaleController::class)->only(['index', 'show', 'store'])->middleware('role:admin,cashier,manager');
