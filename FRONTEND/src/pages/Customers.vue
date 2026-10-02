@@ -15,7 +15,7 @@ const formError = ref("");
 
 const form = ref({
   customer_name: "",
-  phone: "",
+  phone_number: "",
   email: "",
   address: "",
 });
@@ -30,7 +30,7 @@ const filteredCustomers = computed(() => {
   return customers.value.filter(
     (customer) =>
       customer.customer_name?.toLowerCase().includes(keyword) ||
-      customer.phone?.toLowerCase().includes(keyword) ||
+      customer.phone_number?.toLowerCase().includes(keyword) ||
       customer.email?.toLowerCase().includes(keyword)
   );
 });
@@ -55,7 +55,7 @@ const openCreateModal = () => {
 
   form.value = {
     customer_name: "",
-    phone: "",
+    phone_number: "",
     email: "",
     address: "",
   };
@@ -69,7 +69,7 @@ const openEditModal = (customer) => {
 
   form.value = {
     customer_name: customer.customer_name ?? "",
-    phone: customer.phone ?? "",
+    phone: customer.phone_number ?? "",
     email: customer.email ?? "",
     address: customer.address ?? "",
   };
@@ -270,7 +270,7 @@ onMounted(() => {
               </td>
 
               <td class="px-6 py-4 text-sm text-gray-600">
-                {{ customer.phone || "—" }}
+                {{ customer.phone_number || "—" }}
               </td>
 
               <td class="px-6 py-4 text-sm text-gray-600">
@@ -323,7 +323,7 @@ onMounted(() => {
                 </h3>
 
                 <p class="mt-1 text-xs text-gray-400">
-                  {{ customer.phone || "No phone" }}
+                  {{ customer.phone_number || "No phone" }}
                 </p>
               </div>
             </div>
@@ -465,7 +465,7 @@ onMounted(() => {
             <label class="mb-2 block text-sm font-medium text-gray-700"> Phone </label>
 
             <input
-              v-model="form.phone"
+              v-model="form.phone_number"
               type="tel"
               placeholder="e.g. 0712345678"
               class="h-11 w-full rounded-lg border border-gray-300 px-3 text-sm outline-none focus:border-gray-500 focus:ring-4 focus:ring-gray-100"
