@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -51,4 +52,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Sale update and deletion
     Route::apiResource('sales', SaleController::class)->only(['update', 'destroy'])->middleware('role:admin,manager');
+
+    // Category viewing
+    Route::apiResource('categories', CategoryController::class)
+        ->only(['index', 'show'])
+        ->middleware('role:admin,manager,cashier');
+
+    // Category management
+    Route::apiResource('categories', CategoryController::class)
+        ->only(['store', 'update', 'destroy'])
+        ->middleware('role:admin,manager');
 });
