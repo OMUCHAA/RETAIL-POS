@@ -3,6 +3,7 @@ import Categories from '@/pages/Categories.vue';
 import Home from '@/pages/Home.vue';
 import Login from '@/pages/Login.vue';
 import Products from '@/pages/Products.vue';
+import Suppliers from '@/pages/Suppliers.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
@@ -13,6 +14,7 @@ const router = createRouter({
             {name: 'home', path: 'home', component: Home},
             {name: 'products', path: 'products', component: Products},
             {name: 'categories', path: 'categories', component: Categories},
+            {name: 'suppliers', path: 'suppliers', component: Suppliers},
         ]}
     ]
 });
