@@ -5,8 +5,9 @@ import Home from '@/pages/Home.vue';
 import Login from '@/pages/Login.vue';
 import Products from '@/pages/Products.vue';
 import Purchases from '@/pages/Purchases.vue';
+import Receipt from '@/pages/Receipt.vue';
+import Reports from '@/pages/Reports.vue';
 import Sales from '@/pages/Sales.vue';
-import SalesHistory from '@/pages/SalesHistory.vue';
 import Suppliers from '@/pages/Suppliers.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
@@ -22,8 +23,8 @@ const router = createRouter({
             {name: 'customers', path: 'customers', component: Customers},
             {name: 'purchases', path: 'purchases', component: Purchases},
             {name: 'sales', path: 'sales', component: Sales},
-            {name: 'sales-history', path: 'sales-history', component: SalesHistory},
-            {name: 'sale-receipt', path: 'sale/:id/receipt', component: SalesHistory},
+            {name: 'reports', path: 'reports', component: Reports},
+            {name: 'receipt', path: 'receipt/:id', component: Receipt},
         ]}
     ]
 });
