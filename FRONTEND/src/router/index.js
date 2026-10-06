@@ -1,7 +1,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Categories from '@/pages/Categories.vue';
 import Customers from '@/pages/Customers.vue';
-import Home from '@/pages/Home.vue';
+import Dashboard from '@/pages/Dashboard.vue';
 import Inventory from '@/pages/Inventory.vue';
 import Login from '@/pages/Login.vue';
 import Products from '@/pages/Products.vue';
@@ -17,7 +17,7 @@ const router = createRouter({
     routes: [
         {path: '/login', name: 'login', component: Login},
         {path: '/', component: AppLayout, children: [
-            {name: 'home', path: 'home', component: Home},
+            {name: 'home', path: 'home', component: Dashboard},
             {name: 'products', path: 'products', component: Products},
             {name: 'categories', path: 'categories', component: Categories},
             {name: 'suppliers', path: 'suppliers', component: Suppliers},
