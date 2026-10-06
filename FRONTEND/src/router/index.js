@@ -2,6 +2,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import Categories from '@/pages/Categories.vue';
 import Customers from '@/pages/Customers.vue';
 import Home from '@/pages/Home.vue';
+import Inventory from '@/pages/Inventory.vue';
 import Login from '@/pages/Login.vue';
 import Products from '@/pages/Products.vue';
 import Purchases from '@/pages/Purchases.vue';
@@ -25,6 +26,7 @@ const router = createRouter({
             {name: 'sales', path: 'sales', component: Sales},
             {name: 'reports', path: 'reports', component: Reports},
             {name: 'receipt', path: 'receipt/:id', component: Receipt},
+            {name: 'inventory', path: 'inventory', component: Inventory},
         ]}
     ]
 });
