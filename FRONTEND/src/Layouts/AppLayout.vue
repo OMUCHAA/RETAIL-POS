@@ -102,6 +102,15 @@
         </RouterLink>
 
         <RouterLink
+          to="/inventory"
+          class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
+          active-class="bg-gray-100 text-gray-900"
+          @click="sidebarOpen = false"
+        >
+          Inventory
+        </RouterLink>
+
+        <RouterLink
           to="/customers"
           class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
           active-class="bg-gray-100 text-gray-900"
