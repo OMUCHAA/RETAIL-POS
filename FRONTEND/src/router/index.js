@@ -17,11 +17,11 @@ const router = createRouter({
     routes: [
         {path: '/login', name: 'login', component: Login},
         {path: '/', component: AppLayout, children: [
-            {name: 'home', path: 'home', component: Dashboard},
+            {name: 'home', path: 'dashboard', component: Dashboard},
             {name: 'products', path: 'products', component: Products},
             {name: 'categories', path: 'categories', component: Categories},
             {name: 'suppliers', path: 'suppliers', component: Suppliers},
-            {name: 'customers', path: 'customers', component: Customers},
+            {name: 'customers', path: 'customers', component: Customers},   
             {name: 'purchases', path: 'purchases', component: Purchases},
             {name: 'sales', path: 'sales', component: Sales},
             {name: 'reports', path: 'reports', component: Reports},
